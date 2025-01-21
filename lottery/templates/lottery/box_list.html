@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cash Boxes</title>
+</head>
+<body>
+    <h1>Cash Boxes</h1>
+    <nav>
+        <a href="{% url 'logout' %}">Logout</a> |
+        <a href="{% url 'register' %}">Register</a> |
+        <a href="{% url 'login' %}">Login</a>
+    </nav>
+    <ul>
+        {% for box in boxes %}
+        <li>
+            <a href="{% url 'box_detail' box.id %}">
+                {{ box.get_box_type_display }} Box - ${{ box.monthly_amount }}
+            </a>
+            (Cycle {{ box.current_cycle }})
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
