@@ -5,7 +5,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import CashBox, FamilyMember, Membership
-
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from .forms import RegisterForm, LoginForm
 
 # Views
 
@@ -26,28 +28,48 @@ def box_detail(request, box_id):
         'members': members
     })
 
+#
+# def register(request):
+#     """Handles user registration."""
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             # Create a FamilyMember for the user
+#             FamilyMember.objects.create(user=user)
+#             return redirect('login')  # Redirect to login page
+#     else:
+#         form = UserCreationForm()
+#
+#     return render(request, 'registration/register.html', {'forms.py': form})
+#
+#
+
 
 def register(request):
-    """Handles user registration."""
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Create a FamilyMember for the user
-            FamilyMember.objects.create(user=user)
-            return redirect('login')  # Redirect to login page
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('home')
     else:
-        form = UserCreationForm()
-
+        form = RegisterForm()
     return render(request, 'registration/register.html', {'form': form})
 
-
-# URL Patterns
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),  # Built-in auth views
-    path('', box_list, name='box_list'),  # Main page showing box list
-    path('box/<int:box_id>/', box_detail, name='box_detail'),  # Box detail page
-    path('register/', register, name='register'),  # User registration
-]
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+    else:
+        form = LoginForm()
+    return render(request, 'registration/login.html', {'form': form})
