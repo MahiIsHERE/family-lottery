@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <h2>Welcome, {{ user.username }}!</h2>
+        <a href="{% url 'logout' %}">Logout</a>  <!-- Logout link -->
+    {% else %}
+        <h2>Welcome to the Lottery!</h2>
+        <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">register</a>.</p>
+    {% endif %}
+</body>
+</html>
